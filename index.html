@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Vanguardias Literarias</title>
+    <style>
+        :root {
+            --primary: #6a1b9a;
+            --secondary: #9c27b0;
+            --accent: #e1bee7;
+            --light: #f3e5f5;
+            --dark: #4a148c;
+            --correct: #4caf50;
+            --wrong: #f44336;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--light), var(--accent));
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            position: relative;
+        }
+        
+        h1::after {
+            content: "";
+            display: block;
+            width: 100px;
+            height: 4px;
+            background: var(--secondary);
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .question-container {
+            margin-bottom: 25px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .question {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark);
+            line-height: 1.4;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        .option {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            background-color: white;
+        }
+        
+        .option:hover {
+            border-color: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .option.selected {
+            border-color: var(--primary);
+            background-color: var(--accent);
+            font-weight: bold;
+        }
+        
+        .option.correct {
+            border-color: var(--correct);
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .option.wrong {
+            border-color: var(--wrong);
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .next-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .next-btn:active {
+            transform: translateY(0);
+        }
+        
+        .next-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result-container {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .result-title {
+            font-size: 2em;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .score {
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 20px 0;
+        }
+        
+        .restart-btn {
+            padding: 15px 30px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            font-style: italic;
+            color: #666;
+        }
+        
+        .decoration {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: rgba(156, 39, 176, 0.1);
+            z-index: 0;
+        }
+        
+        .decoration-1 {
+            top: -50px;
+            right: -50px;
+        }
+        
+        .decoration-2 {
+            bottom: -50px;
+            left: -50px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .question {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="decoration decoration-1"></div>
+        <div class="decoration decoration-2"></div>
+        
+        <h1>Trivia Vanguardias Literarias</h1>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        
+        <div id="quiz-container">
+            <div class="question-container" id="question-container">
+                <div class="question" id="question"></div>
+                <div class="options" id="options"></div>
+            </div>
+            <button class="next-btn" id="next-btn" disabled>Siguiente</button>
+        </div>
+        
+        <div class="result-container" id="result-container">
+            <h2 class="result-title">¡Resultados!</h2>
+            <div class="score" id="score"></div>
+            <p id="feedback" class="feedback"></p>
+            <button class="restart-btn" id="restart-btn">Jugar de nuevo</button>
+        </div>
+    </div>
+
+    <footer>HECHO POR LA CABRA ALFRED</footer>
+
+    <script>
+        const questions = [
+            {
+                question: "¿Qué significa el término 'vanguardia' en su origen francés?",
+                options: [
+                    "Los que rompen las reglas",
+                    "La parte delantera del ejército (los que van al frente)",
+                    "Los artistas revolucionarios",
+                    "Los creadores de nuevas formas"
+                ],
+                answer: 1,
+                explanation: "El término 'vanguardia' viene del francés 'avant-garde', que literalmente significa 'la parte delantera del ejército', es decir, los que van al frente, los que se adelantan a su tiempo."
+            },
+            {
+                question: "¿Cuál de estas técnicas NO es característica de las novelas vanguardistas?",
+                options: [
+                    "Monólogo interior",
+                    "Narrativa lineal tradicional",
+                    "Flujo de conciencia",
+                    "Multiplicidad de voces narrativas"
+                ],
+                answer: 1,
+                explanation: "Las novelas vanguardistas se caracterizan por romper con la narrativa lineal tradicional, utilizando técnicas innovadoras como el monólogo interior, el flujo de conciencia y múltiples voces narrativas."
+            },
+            {
+                question: "¿Qué novela de James Joyce sigue la vida de Leopold Bloom en un solo día en Dublín?",
+                options: [
+                    "Rayuela",
+                    "Ulises",
+                    "La metamorfosis",
+                    "Pedro Páramo"
+                ],
+                answer: 1,
+                explanation: "'Ulises' de James Joyce es una novela experimental que sigue la vida de Leopold Bloom en un solo día en Dublín, utilizando técnicas innovadoras como el monólogo interior."
+            },
+            {
+                question: "¿Qué autor escribió 'Rayuela', una novela que puede leerse de múltiples formas?",
+                options: [
+                    "Juan Rulfo",
+                    "Julio Cortázar",
+                    "Franz Kafka",
+                    "Roberto Bolaño"
+                ],
+                answer: 1,
+                explanation: "Julio Cortázar, autor argentino, escribió 'Rayuela', una novela innovadora que puede leerse de forma lineal o siguiendo un orden alternativo de capítulos."
+            },
+            {
+                question: "¿Qué característica de las novelas vanguardistas se refiere al uso de distintos puntos de vista narrativos?",
+                options: [
+                    "Experimentación lingüística",
+                    "Perspectivas múltiples",
+                    "Ruptura con la linealidad temporal",
+                    "Influencia de corrientes artísticas"
+                ],
+                answer: 1,
+                explanation: "Las 'perspectivas múltiples' son una característica clave de las novelas vanguardistas, donde se emplean distintos puntos de vista narrativos y voces entrecruzadas."
+            },
+            {
+                question: "¿Qué novela de Franz Kafka trata sobre un hombre que despierta convertido en insecto?",
+                options: [
+                    "El proceso",
+                    "El castillo",
+                    "La metamorfosis",
+                    "América"
+                ],
+                answer: 2,
+                explanation: "'La metamorfosis' de Franz Kafka es el famoso relato sobre Gregorio Samsa, un hombre que despierta convertido en un insecto, representando el absurdo y la alienación."
+            },
+            {
+                question: "¿Qué movimiento artístico influyó en las vanguardias literarias con su enfoque en lo ilógico y onírico?",
+                options: [
+                    "Realismo",
+                    "Surrealismo",
+                    "Naturalismo",
+                    "Clasicismo"
+                ],
+                answer: 1,
+                explanation: "El surrealismo, con su interés por lo onírico, lo ilógico y el subconsciente, fue una de las corrientes artísticas que más influyó en las vanguardias literarias."
+            },
+            {
+                question: "¿Qué novela de Juan Rulfo mezcla realidad y fantasía en un pueblo habitado por fantasmas?",
+                options: [
+                    "Los detectives salvajes",
+                    "Pedro Páramo",
+                    "El llano en llamas",
+                    "Ulises"
+                ],
+                answer: 1,
+                explanation: "'Pedro Páramo' de Juan Rulfo es una novela fundamental que mezcla realidad y fantasía, con una narrativa no lineal y un pueblo habitado por fantasmas."
+            },
+            {
+                question: "¿Qué técnica narrativa consiste en representar los pensamientos de un personaje tal como fluyen en su mente?",
+                options: [
+                    "Narración omnisciente",
+                    "Flujo de conciencia",
+                    "Estilo indirecto libre",
+                    "Monólogo dramático"
+                ],
+                answer: 1,
+                explanation: "El 'flujo de conciencia' es una técnica narrativa característica de las vanguardias que busca representar los pensamientos de un personaje tal como fluyen en su mente, sin una estructura lógica tradicional."
+            },
+            {
+                question: "¿Qué autor chileno escribió 'Los detectives salvajes', mezclando novela negra con experimentación narrativa?",
+                options: [
+                    "Julio Cortázar",
+                    "Roberto Bolaño",
+                    "Gabriel García Márquez",
+                    "Mario Vargas Llosa"
+                ],
+                answer: 1,
+                explanation: "Roberto Bolaño, escritor chileno, es el autor de 'Los detectives salvajes', una novela que combina elementos de novela negra con una estructura experimental y múltiples puntos de vista."
+            }
+        ];
+
+        // Variables del juego
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedOption = null;
+        
+        // Elementos del DOM
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const nextButton = document.getElementById('next-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultContainer = document.getElementById('result-container');
+        const scoreElement = document.getElementById('score');
+        const feedbackElement = document.getElementById('feedback');
+        const restartButton = document.getElementById('restart-btn');
+        
+        // Cargar pregunta
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            questionElement.textContent = question.question;
+            
+            optionsElement.innerHTML = '';
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.classList.add('option');
+                button.textContent = option;
+                button.addEventListener('click', () => selectOption(index));
+                optionsElement.appendChild(button);
+            });
+            
+            updateProgressBar();
+            nextButton.disabled = true;
+            selectedOption = null;
+        }
+        
+        // Seleccionar opción
+        function selectOption(index) {
+            if (selectedOption !== null) return;
+            
+            selectedOption = index;
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach((option, i) => {
+                option.classList.remove('selected');
+                if (i === index) {
+                    option.classList.add('selected');
+                }
+            });
+            
+            nextButton.disabled = false;
+        }
+        
+        // Mostrar resultado y pasar a siguiente pregunta
+        function showResult() {
+            const options = document.querySelectorAll('.option');
+            const correctAnswer = questions[currentQuestion].answer;
+            
+            options.forEach((option, index) => {
+                option.classList.remove('selected');
+                if (index === correctAnswer) {
+                    option.classList.add('correct');
+                } else if (index === selectedOption && index !== correctAnswer) {
+                    option.classList.add('wrong');
+                }
+            });
+            
+            if (selectedOption === correctAnswer) {
+                score++;
+            }
+            
+            nextButton.textContent = 'Siguiente';
+            if (currentQuestion === questions.length - 1) {
+                nextButton.textContent = 'Ver resultados';
+            }
+        }
+        
+        // Siguiente pregunta o mostrar resultados
+        function nextQuestion() {
+            if (selectedOption === null) return;
+            
+            showResult();
+            
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                setTimeout(loadQuestion, 1000);
+            } else {
+                showFinalResults();
+            }
+            
+            nextButton.disabled = true;
+        }
+        
+        // Mostrar resultados finales
+        function showFinalResults() {
+            quizContainer.style.display = 'none';
+            resultContainer.style.display = 'block';
+            
+            scoreElement.textContent = `${score} / ${questions.length}`;
+            
+            let feedback = '';
+            const percentage = (score / questions.length) * 100;
+            
+            if (percentage >= 80) {
+                feedback = '¡Excelente! Eres un experto en vanguardias literarias.';
+            } else if (percentage >= 60) {
+                feedback = '¡Buen trabajo! Tienes un buen conocimiento de las vanguardias.';
+            } else if (percentage >= 40) {
+                feedback = 'No está mal, pero podrías repasar más sobre las vanguardias literarias.';
+            } else {
+                feedback = 'Parece que las vanguardias no son lo tuyo... ¡pero puedes mejorar!';
+            }
+            
+            feedbackElement.textContent = feedback;
+        }
+        
+        // Reiniciar trivia
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            selectedOption = null;
+            
+            quizContainer.style.display = 'block';
+            resultContainer.style.display = 'none';
+            
+            loadQuestion();
+            nextButton.textContent = 'Siguiente';
+        }
+        
+        // Actualizar barra de progreso
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        // Event listeners
+        nextButton.addEventListener('click', nextQuestion);
+        restartButton.addEventListener('click', restartQuiz);
+        
+        // Iniciar trivia
+        loadQuestion();
+    </script>
+</body>
+</html>
